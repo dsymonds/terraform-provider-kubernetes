@@ -219,6 +219,9 @@ func resourceKubernetesDeploymentCreate(d *schema.ResourceData, meta interface{}
 
 	d.SetId(buildId(out.ObjectMeta))
 
+	/* NOTE(dsymonds): Don't wait for update to complete.
+	   See also https://github.com/terraform-providers/terraform-provider-kubernetes/issues/605.
+
 	log.Printf("[DEBUG] Waiting for deployment %s to schedule %d replicas", d.Id(), *out.Spec.Replicas)
 
 	// 10 mins should be sufficient for scheduling ~10k replicas
@@ -227,6 +230,8 @@ func resourceKubernetesDeploymentCreate(d *schema.ResourceData, meta interface{}
 	if err != nil {
 		return err
 	}
+
+	*/
 
 	log.Printf("[INFO] Submitted new deployment: %#v", out)
 
@@ -268,11 +273,14 @@ func resourceKubernetesDeploymentUpdate(d *schema.ResourceData, meta interface{}
 	}
 	log.Printf("[INFO] Submitted updated deployment: %#v", out)
 
+	/* NOTE(dsymonds): Don't wait for update to complete.
+	   See also https://github.com/terraform-providers/terraform-provider-kubernetes/issues/605.
 	err = resource.Retry(d.Timeout(schema.TimeoutUpdate),
 		waitForDeploymentReplicasFunc(conn, namespace, name))
 	if err != nil {
 		return err
 	}
+	*/
 
 	return resourceKubernetesDeploymentRead(d, meta)
 }
